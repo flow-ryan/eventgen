@@ -1,13 +1,13 @@
 include config.mk
 
-CC	  	= clang
-CXX	  	= clang++
-LD	  	= ld
+CC	  	= cl
+CXX	  	= cl
+LD	  	= LINK
 NVCC	  	= nvcc
 CXX_STD	  	= c++11
 WARNINGS  	= -Wall -Werror -pedantic
 CFLAGS	  	= -fPIC -O3 -ffast-math
-LDFLAGS	  	= ${LIBS}
+# LDFLAGS	  	= $(LIBS)
 OBJ_FILES   	= $(SRC:.cpp=.o)
 CU_OBJ_FILES 	= $(CU_SRC:.cu=.o)
 
@@ -20,9 +20,9 @@ CU_SRC 		= kernels/dvs.cu \
 INCLUDES  	= -I. \
 		  -Ikernels \
 		  -Icontrib \
-		  -I${CUDA_INCLUDE_PATH}
+		  -I$(CUDA_INCLUDE_PATH)
 
-LIBS	  	= -L${CUDA_LIB_PATH} \
+LIBS	  	= -L$(CUDA_LIB_PATH) \
 		  -lpthread -lm \
 		  -lboost_system -lboost_program_options \
 		  -lcuda -lcudart 
@@ -30,14 +30,14 @@ LIBS	  	= -L${CUDA_LIB_PATH} \
 
 all: eventgen
 
-eventgen: $(OBJ_FILES) ${CU_OBJ_FILES}
-	${CXX} ${LDFLAGS} $^ -o $@
+eventgen: $(OBJ_FILES) $(CU_OBJ_FILES)
+	$(CXX) $(LDFLAGS) $^ -o $@
 
 %.o: %.cpp
-	${CXX} ${CFLAGS} ${WARNINGS} ${INCLUDES} -std=${CXX_STD} -c $<
+	$(CXX) $(CFLAGS) $(WARNINGS) $(INCLUDES) -std=$(CXX_STD) -c $<
 
 kernels/%.o: kernels/%.cu
-	${NVCC} ${INCLUDES} -std=${CXX_STD} -c $< -o $@
+	$(NVCC) $(INCLUDES) -std=$(CXX_STD) -c $< -o $@
 
 clean:
 	rm -rf main.o
